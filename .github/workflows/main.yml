@@ -69,8 +69,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           # Явно указываем путь к контексту и Dockerfile
-          context: backend
-          file: backend/Dockerfile
+          context: .
+          file: ./backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
 
