@@ -1,27 +1,38 @@
 version: '3'
 
 volumes:
-  pg_data:
-  static:
+  pg_data:          # Для хранения данных PostgreSQL
+  static:           # Для статики фронтенда и бэкенда
+  media:            # Для медиа-файлов, загружаемых пользователями
 
 services:
   db:
     image: postgres:13
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+
   backend:
     build: ./backend/
     env_file: .env
+    volumes:
+      - static:/backend_static/       # Привязка для статики
+      - media:/backend_media/         # Привязка для медиа-файлов
+    depends_on:
+      - db                            # Бэкенд зависит от базы данных
+
   frontend:
-    env_file: .env
     build: ./frontend/
+    env_file: .env
     command: cp -r /app/build/. /static/
     volumes:
-      - static:/static
+      - static:/static/               # Привязка статики для фронтенда
+
   gateway:
     build: ./nginx/
     env_file: .env
     ports:
       - 9000:80
     volumes:
-      - static:/static
+      - static:/static/               # Привязка статики для Nginx
+      - media:/media/                 # Привязка медиа-файлов для Nginx
