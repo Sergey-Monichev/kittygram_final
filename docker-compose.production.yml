@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    image: sergeymonichev/kittygram_backend:latest
+    env_file: .env
+    volumes:
+      - static:/backend_static/
+      - media:/backend_media/
+    depends_on:
+      - db
+
+  frontend:
+    image: sergeymonichev/kittygram_frontend:latest
+    volumes:
+      - static:/frontend_static/
+
+  gateway:
+    image: sergeymonichev/kittygram_gateway:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - static:/static/
+      - media:/media/
+
+  db:
+    image: postgres:13
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file: .env
+
+volumes:
+  static:
+  media:
+  pg_data:
