@@ -1,0 +1,5 @@
+node_modules/
+frontend/
+tests/
+pytest.ini
+README.md
