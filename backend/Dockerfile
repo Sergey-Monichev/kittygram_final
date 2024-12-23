@@ -1,6 +1,9 @@
 # Используем базовый образ Python
 FROM python:3.9-slim
 
+# Переменные окружения (из файла .env)
+ENV PYTHONUNBUFFERED=1
+
 # Устанавливаем зависимости для PostgreSQL и системы
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -16,11 +19,11 @@ COPY requirements.txt .
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Создаем директорию для статики
+RUN mkdir -p /app/backend_static
+
 # Копируем оставшиеся файлы проекта
 COPY . .
-
-# Переменные окружения (из файла .env)
-ENV PYTHONUNBUFFERED=1
 
 # Собираем статику
 RUN python manage.py collectstatic --no-input
