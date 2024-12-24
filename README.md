@@ -78,7 +78,7 @@ pytest
 - Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
 - В корне проекта есть файл `kittygram_workflow.yml`.
 
-## Автор
+## Автор нов
 **Сергей Моничев**  
 GitHub: [Sergey-Monichev](https://github.com/Sergey-Monichev/)
 
