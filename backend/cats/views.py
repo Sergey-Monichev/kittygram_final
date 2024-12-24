@@ -4,13 +4,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 
 from .models import Achievement, Cat
-from .serializers import (
-    AchievementSerializer,
-    CatSerializer,
-    UserSerializer,
-)
+from .serializers import AchievementSerializer, CatSerializer, UserSerializer
 
-# Получаем модель пользователя
 User = get_user_model()
 
 
