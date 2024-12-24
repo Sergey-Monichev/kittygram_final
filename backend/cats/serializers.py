@@ -2,6 +2,7 @@ import base64
 import datetime as dt
 
 import webcolors
+from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
@@ -103,3 +104,10 @@ class CatSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+# Добавляем сериализатор для пользователей
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'first_name', 'last_name')

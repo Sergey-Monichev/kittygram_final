@@ -1,8 +1,17 @@
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
 
 from .models import Achievement, Cat
-from .serializers import AchievementSerializer, CatSerializer
+from .serializers import (
+    AchievementSerializer,
+    CatSerializer,
+    UserSerializer
+)
+
+# Получаем модель пользователя
+User = get_user_model()
 
 
 class CatViewSet(viewsets.ModelViewSet):
@@ -18,3 +27,11 @@ class AchievementViewSet(viewsets.ModelViewSet):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
     pagination_class = None
+
+
+# Добавляем контроллер для работы с пользователями
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = PageNumberPagination
+    permission_classes = [AllowAny]
