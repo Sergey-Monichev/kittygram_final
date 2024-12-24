@@ -12,12 +12,13 @@ router.register(r'achievements', AchievementViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # Основные эндпоинты
-    path('api/auth/', include('djoser.urls')),  # Работа с пользователями и токенами
-    path('api/auth/token/', include('djoser.urls.authtoken')),  # Работа с токенами отдельно
+    path('api/', include(router.urls)),
+    path('api/auth/', include('djoser.urls')),
+    path('api/auth/token/', include('djoser.urls.authtoken')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
     )
