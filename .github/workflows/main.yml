@@ -74,6 +74,7 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
+        timeout-minutes: 30
 
   build_and_push_frontend:
     runs-on: ubuntu-latest

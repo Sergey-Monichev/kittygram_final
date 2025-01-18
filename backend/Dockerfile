@@ -3,7 +3,7 @@ FROM python:3.9-slim
 
 # Устанавливаем переменные окружения
 ENV PYTHONUNBUFFERED=1
-
+ENV DEBIAN_FRONTEND=noninteractive
 # Устанавливаем зависимости для PostgreSQL и системы
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -17,7 +17,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Устанавливаем зависимости
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install psycopg2-binary Pillow && pip install -r requirements.txt --no-cache-dir --timeout 300
+
 
 # Копируем оставшиеся файлы проекта
 COPY . .
