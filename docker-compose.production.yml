@@ -1,38 +1,47 @@
+version: '3.8'
+
 services:
-  backend:
-    image: semo18/kittygram_backend
+  db:
+    image: postgres:13
     env_file: .env
     volumes:
-      - static:/backend_static/
-      - media:/backend_media/
+      - pg_data:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+    env_file: .env
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
+    command: >
+      sh -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi:application"
     depends_on:
       - db
+    restart: always
 
   frontend:
-    image: semo18/kittygram_frontend 
+    image: semo18/kittygram_frontend
     volumes:
-      - static:/static/
+      - static:/app/static
     command: >
-      sh -c "cp -r /app/build/. /static/ && sleep infinity"
+      sh -c "cp -r /app/build/static/* /app/static/ && tail -f /dev/null"
+    restart: always
 
   gateway:
-    image: semo18/kittygram_gateway 
+    image: semo18/kittygram_gateway
     ports:
       - "9000:80"
     depends_on:
       - backend
       - frontend
     volumes:
-      - static:/static/
-      - media:/media/
-
-  db:
-    image: postgres:13
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    env_file: .env
+      - static:/app/static/
+      - media:/app/media/
+    restart: always
 
 volumes:
+  pg_data:
   static:
   media:
-  pg_data:

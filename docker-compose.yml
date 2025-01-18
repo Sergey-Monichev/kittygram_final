@@ -1,9 +1,4 @@
-
-
-volumes:
-  pg_data:         # Хранение данных PostgreSQL
-  static:          # Статика фронтенда и бэкенда
-  media:           # Медиа-файлы, загружаемые пользователями
+version: '3.8'
 
 services:
   db:
@@ -11,30 +6,44 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    restart: always
 
   backend:
-    build: ./backend/
+    build:
+      context: ./backend
     env_file: .env
     volumes:
-      - static:/backend_static/  # Привязка для статики
-      - media:/backend_media/    # Привязка для медиа-файлов
+      - static:/app/static/
+      - media:/app/media/
+    command: >
+      sh -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi:application"
     depends_on:
-      - db  # Бэкенд зависит от базы данных
+      - db
+    restart: always
 
   frontend:
-    build: ./frontend/
-    env_file: .env
-    command: >
-      sh -c "mkdir -p /static/ &&
-             cp -r /app/build/* /static/"
+    build:
+      context: ./frontend
     volumes:
-      - static:/static/  # Привязка статики для фронтенда
+      - static:/app/static
+    command: >
+      sh -c "cp -r /app/build/static/* /app/static/ && tail -f /dev/null"
+    restart: always
 
   gateway:
-    build: ./nginx/
-    env_file: .env
+    build:
+      context: ./nginx
     ports:
-      - 9000:80
+      - "9000:80"
+    depends_on:
+      - backend
+      - frontend
     volumes:
-      - static:/static/  # Привязка статики для Nginx
-      - media:/media/    # Привязка медиа-файлов для Nginx
+      - static:/app/static/
+      - media:/app/media/
+    restart: always
+
+volumes:
+  pg_data:
+  static:
+  media:
