@@ -3,4 +3,3 @@ frontend/
 tests/
 pytest.ini
 README.md
-nginx.conf
