@@ -2,11 +2,8 @@ name: Kittygram CI/CD
 
 on:
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - '*'
+
 
 jobs:
   backend_tests:

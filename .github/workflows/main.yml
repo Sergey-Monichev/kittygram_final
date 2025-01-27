@@ -2,8 +2,8 @@ name: Kittygram CI/CD
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
+
 
 jobs:
   backend_tests:
@@ -51,9 +51,10 @@ jobs:
           cd backend/
           python manage.py test
 
-  build_and_push_backend:
+   build_and_push_backend:
     runs-on: ubuntu-latest
     needs: backend_tests
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -70,8 +71,7 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v4
         with:
-          # Явно указываем путь к контексту и Dockerfile
-          context: ./backend/ # Указываем правильный контекст
+          context: ./backend/
           file: ./backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
@@ -79,6 +79,7 @@ jobs:
   build_and_push_frontend:
     runs-on: ubuntu-latest
     needs: backend_tests
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -101,6 +102,8 @@ jobs:
 
   build_and_push_gateway:
     runs-on: ubuntu-latest
+    needs: backend_tests
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -123,11 +126,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - backend_tests
       - build_and_push_backend
       - build_and_push_frontend
       - build_and_push_gateway
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -156,7 +160,6 @@ jobs:
             sudo docker compose -f docker-compose.production.yml up -d
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --no-input
-            sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/backend_static/static/. /static/
 
   send_message:
     runs-on: ubuntu-latest
