@@ -31,6 +31,7 @@ jobs:
         with:
           python-version: 3.9
 
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -166,4 +167,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: "Деплой успешно выполнен! 🎉"
+          message: "Деплой успешно выполнен Ура! 🎉"
