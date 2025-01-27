@@ -1,47 +1,42 @@
+volumes:
+  pg_data:
+  static: # Volume для статики
+  media:  # Volume для медиа-файлов
+
 services:
   db:
     image: postgres:13
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
-    restart: always
 
   backend:
-    build:
-      context: ./backend
+    build: ./backend/
     env_file: .env
     volumes:
-      - static:/app/static/
-      - media:/app/media/
-    command: >
-      sh -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi:application"
+      - static:/backend_static
+      - media:/app/media
+    ports:
+      - "9000:8000"  # Прокси на порт 9000
     depends_on:
       - db
-    restart: always
 
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend/
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/app/static
-    command: >
-      sh -c "cp -r /app/build/static/* /app/static/ && tail -f /dev/null"
-    restart: always
-
-  gateway:
-    build:
-      context: ./nginx
-    ports:
-      - "9000:80"
+      - static:/frontend_static
     depends_on:
       - backend
-      - frontend
-    volumes:
-      - static:/app/static/
-      - media:/app/media/
-    restart: always
 
-volumes:
-  pg_data:
-  static:
-  media:
+  gateway:
+    build: ./gateway/
+    env_file: .env
+    volumes:
+      - static:/staticfiles/
+      - media:/mediafiles/
+    ports:
+      - "9001:80"  # Прокси на порт 9000 для фронтенда
+    depends_on:
+      - frontend

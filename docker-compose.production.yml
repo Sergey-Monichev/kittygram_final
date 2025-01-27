@@ -1,45 +1,49 @@
+volumes:
+    pg_data:
+    static_volume:
+    media_volume:
+
 services:
   db:
     image: postgres:13
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
-    restart: always
 
   backend:
-    build:
-      context: ./backend
+    image: semo18/kittygram_backend:latest # Замените username на ваш логин в Docker Hub
+    platform: linux/amd64
     env_file: .env
+    ports:
+      - "9000:9000"
+    command: gunicorn --bind 0.0.0.0:9000 kittygram_backend.wsgi:application
     volumes:
-      - static:/app/static/
-      - media:/app/media/
-    command: >
-      sh -c "python manage.py migrate && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:8000 kittygram_backend.wsgi:application"
+      - static_volume:/backend_static
+      - media_volume:/app/media
     depends_on:
       - db
-    restart: always
 
   frontend:
-    image: semo18/kittygram_frontend
+    image: semo18/kittygram_frontend:latest
+  # Замените username на ваш логин в Docker Hub
+    platform: linux/amd64 
+    env_file: .env
+    command: cp -r /app/build/. /frontend_static/
     volumes:
-      - static:/app/static
-    command: >
-      sh -c "cp -r /app/build/static/* /app/static/ && tail -f /dev/null"
-    restart: always
+      - static_volume:/frontend_static
+    depends_on:
+      - backend
 
   gateway:
-    image: semo18/kittygram_gateway
+    image: semo18/kittygram_gateway:latest
+  # Замените username на ваш логин в Docker Hub
+    platform: linux/amd64
+    env_file: .env
     ports:
-      - "9000:80"
+      - "9001:80"
+    volumes:
+      - static_volume:/staticfiles/
+      - media_volume:/mediafiles/
     depends_on:
       - backend
       - frontend
-    volumes:
-      - static:/app/static/
-      - media:/app/media/
-    restart: always
-
-volumes:
-  pg_data:
-  static:
-  media:

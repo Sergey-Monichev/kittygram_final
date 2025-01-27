@@ -1,30 +1,22 @@
-# Используем базовый образ Python
-FROM python:3.9-slim
-
-# Устанавливаем переменные окружения
-ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND=noninteractive
-# Устанавливаем зависимости для PostgreSQL и системы
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Базовый образ Python
+FROM python:3.9
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем зависимости проекта
-COPY requirements.txt .
+# Копируем requirements.txt для установки зависимостей
+COPY requirements.txt /app/
 
 # Устанавливаем зависимости
-RUN pip install psycopg2-binary Pillow && pip install -r requirements.txt --no-cache-dir --timeout 300
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Копируем весь код в контейнер
+COPY . /app/
 
-# Копируем оставшиеся файлы проекта
-COPY . .
+# Задаём переменную окружения для Django
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Открываем порт для работы с сервером
-EXPOSE 8000
+# Выполняем миграции, собираем статику
+CMD ["gunicorn", "--bind", "0.0.0.0:9000", "kittygram_backend.wsgi:application"]
 
-# Команда запуска приложения через Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kittygram_backend.wsgi:application"]
