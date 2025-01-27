@@ -167,4 +167,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: "Деплой успешно выполнен Ура! 🎉"
+          message: "Деплой успешно выполнен Ура Tesr2! 🎉"
