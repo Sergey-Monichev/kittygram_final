@@ -1,6 +1,7 @@
 # Kittygram - Финальное задание
 
-![CI/CD](https://github.com/Sergey-Monichev/kittygram_final/actions/workflows/kittygram_workflow.yml/badge.svg)
+![CI/CD](/Users/sergeymonichev/Desktop/Yande
+x/kittygram_final/.github/workflows/main.yml')
 
 ## Описание проекта
 Kittygram — это веб-приложение для управления базой данных о кошках. Оно поддерживает добавление, редактирование и просмотр информации о питомцах, а также управление достижениями.
